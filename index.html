@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
     <script>
-        // URLに 't=' が含まれていない場合、タイムスタンプを付与して強制再読み込み
         if (location.search.indexOf('t=') === -1) {
             const now = Date.now();
             const joinChar = location.search ? '&' : '?';
@@ -10,16 +9,13 @@
         }
     </script>
     <meta charset="UTF-8">
-    <!-- キャッシュ無効化のための meta タグ -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <!-- スマホでの拡大・縮小を防止 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>英検3級 単語マスター</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- パーフェクト演出用 confettiライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -50,7 +46,6 @@
             background: #94a3b8;
         }
 
-        /* ★ iPhone Safari用 強制フォーカス・ホバー残留防止CSS */
         * {
             -webkit-tap-highlight-color: transparent;
         }
@@ -62,7 +57,6 @@
             -webkit-user-select: none;
         }
 
-        /* PCなどのマウス操作時のみホバー効果を適用（Safari残留防止） */
         @media (hover: hover) and (pointer: fine) {
             .choice-btn:hover {
                 background-color: rgba(238, 242, 255, 0.9) !important;
@@ -87,25 +81,21 @@
             </h1>
             
             <div class="flex items-center gap-1.5 md:gap-2">
-                <!-- Speech Synthesizer Toggle -->
                 <button onclick="toggleSpeech()" id="btn-speech-toggle" class="p-1.5 md:p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-xs md:text-sm transition" title="読み上げオン/オフ">
                     <i class="fa-solid fa-bullhorn" id="icon-speech"></i>
                 </button>
 
-                <!-- Sound Toggle -->
                 <button onclick="toggleAudio()" id="btn-audio-toggle" class="p-1.5 md:p-2 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-white text-xs md:text-sm transition" title="効果音オン/オフ">
                     <i class="fa-solid fa-volume-high" id="icon-audio"></i>
                 </button>
 
-                <!-- Data Import/Export Modal Trigger -->
                 <button onclick="openDataModal()" class="p-1.5 md:px-3 md:py-1.5 rounded-xl bg-indigo-700/60 hover:bg-indigo-700 text-xs md:text-sm font-semibold transition flex items-center gap-1">
                     <i class="fa-solid fa-database"></i> <span class="hidden md:inline">データ管理</span>
                 </button>
 
-                <!-- Stats Header -->
                 <div id="header-stats" class="text-[11px] md:text-sm bg-indigo-800/80 px-2 py-1 md:px-3 md:py-1.5 rounded-xl flex items-center gap-1.5 border border-indigo-500/30">
                     <i class="fa-solid fa-trophy text-yellow-400"></i>
-                    <span>クリア: <strong id="cleared-count" class="text-yellow-300 font-extrabold">0</strong> / <span id="total-stages-count">6</span></span>
+                    <span>クリア: <strong id="cleared-count" class="text-yellow-300 font-extrabold">0</strong> / <span id="total-stages-count">7</span></span>
                 </div>
             </div>
         </div>
@@ -115,8 +105,6 @@
 
         <!-- SCREEN: HOME / STAGE SELECT -->
         <section id="screen-home" class="space-y-4 sm:space-y-6 pt-1">
-            
-            <!-- Hero Title & Mode Selector -->
             <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-3 sm:space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                     <div>
@@ -126,7 +114,6 @@
                         <p class="text-slate-500 text-xs md:text-sm mt-0.5">英検3級頻出単語マスター！モードごとの進捗状況を確認しながら満点を目指しましょう。</p>
                     </div>
 
-                    <!-- Mode Toggle Selector -->
                     <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-start md:self-auto flex-wrap gap-1">
                         <button id="mode-choice-btn" onclick="selectMode('choice')" class="px-2.5 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 shadow-sm bg-indigo-600 text-white">
                             <i class="fa-solid fa-list-check"></i> 英語4択
@@ -140,11 +127,10 @@
                     </div>
                 </div>
 
-                <!-- Overall Progress Bar -->
                 <div>
                     <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-1">
                         <span><span id="current-mode-label" class="text-indigo-600 font-extrabold">英語4択</span> 達成率 (全100%達成度)</span>
-                        <span id="overall-progress-percentage" class="text-indigo-600">0% (0 / 6ステージ)</span>
+                        <span id="overall-progress-percentage" class="text-indigo-600">0% (0 / 7ステージ)</span>
                     </div>
                     <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
                         <div id="overall-progress-bar" class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full w-0 transition-all duration-500"></div>
@@ -152,23 +138,18 @@
                 </div>
             </div>
 
-            <!-- Reset Action Bar -->
             <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-500"><i class="fa-solid fa-book-open mr-1.5 text-indigo-500"></i>全 6 ステージ（全 150 単語）</span>
+                <span class="text-xs font-bold text-slate-500"><i class="fa-solid fa-book-open mr-1.5 text-indigo-500"></i>全 7 ステージ（全 <span id="total-words-display">177</span> 単語）</span>
                 <button onclick="confirmResetProgress()" class="text-xs text-rose-500 hover:text-rose-700 font-medium underline transition">
                     進捗リセット
                 </button>
             </div>
 
-            <!-- Stage Grid Container -->
-            <div id="stage-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
-                <!-- Dynamically populated via JS -->
-            </div>
+            <div id="stage-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-7 gap-2.5"></div>
         </section>
 
         <!-- SCREEN: QUIZ -->
         <section id="screen-quiz" class="hidden space-y-2 max-w-2xl mx-auto w-full pt-1">
-            <!-- Quiz Bar -->
             <div class="flex justify-between items-center bg-white px-3.5 py-2 rounded-xl shadow-sm border border-slate-200">
                 <button onclick="quitQuiz()" class="text-slate-500 hover:text-slate-800 text-xs flex items-center gap-1 font-bold transition">
                     <i class="fa-solid fa-arrow-left"></i> 一覧へ
@@ -185,17 +166,14 @@
                 </div>
             </div>
 
-            <!-- Quiz Stage Progress Bar -->
             <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
                 <div id="quiz-progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
             </div>
 
-            <!-- タイマーバー -->
             <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden border border-slate-200">
                 <div id="timer-bar" class="bg-amber-500 h-full w-full transition-all linear"></div>
             </div>
 
-            <!-- Question Card -->
             <div class="bg-white p-3 sm:p-5 rounded-2xl shadow-sm border border-slate-200 text-center space-y-1 relative overflow-hidden">
                 <div class="flex justify-between items-center">
                     <span id="word-id-tag" class="text-[11px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">No. 1</span>
@@ -211,10 +189,8 @@
                 </div>
             </div>
 
-            <!-- Mode A & B: 4 Choice Buttons Container -->
             <div id="area-choice-mode" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
 
-            <!-- Mode C: Input Word Mode -->
             <form id="area-input-mode" onsubmit="handleInputSubmit(event)" class="hidden space-y-1.5">
                 <div class="relative">
                     <input type="text" id="word-input" autocomplete="off" spellcheck="false" placeholder="英単語を入力..."
@@ -301,7 +277,7 @@
 
                 <div class="bg-indigo-50 border border-indigo-200 p-3.5 rounded-2xl space-y-1">
                     <div class="font-bold text-indigo-900">現在ロード中の単語数</div>
-                    <div class="text-xl font-black text-indigo-600"><span id="modal-word-count">150</span> / 150 語</div>
+                    <div class="text-xl font-black text-indigo-600"><span id="modal-word-count">177</span> 語</div>
                 </div>
 
                 <div class="space-y-2">
@@ -322,17 +298,13 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 py-2 text-center text-[11px] text-slate-400">
         EIKEN Grade 3 Vocabulary Master &copy; 2026
     </footer>
 
     <script>
-        // ==========================================
-        // 1. EIKEN GRADE 3 WORD DATA (grade3.htmlより移植)
-        // ==========================================
         const STAGE_LISTS = [
-            // Stage 1 (27語)
+            // Stage 1
             [
                 { word: "still", meaning: "まだ、今でも" },
                 { word: "Wait a minute.", meaning: "ちょっと待って。" },
@@ -362,7 +334,7 @@
                 { word: "address", meaning: "住所" },
                 { word: "should", meaning: "〜すべき" }
             ],
-            // Stage 2 (18語)
+            // Stage 2
             [
                 { word: "bottle", meaning: "ボトル" },
                 { word: "recycle", meaning: "リサイクルする" },
@@ -383,7 +355,7 @@
                 { word: "yet", meaning: "まだ、もう" },
                 { word: "〜er than...", meaning: "…よりも〜だ" }
             ],
-            // Stage 3 (27語)
+            // Stage 3
             [
                 { word: "borrow", meaning: "借りる" },
                 { word: "lend", meaning: "貸す" },
@@ -413,7 +385,7 @@
                 { word: "send(sent)", meaning: "送る" },
                 { word: "record", meaning: "録画する" }
             ],
-            // Stage 4 (18語)
+            // Stage 4
             [
                 { word: "celebrate", meaning: "〜を祝う" },
                 { word: "boss", meaning: "上司" },
@@ -434,7 +406,7 @@
                 { word: "grow-grew-grown", meaning: "育てる" },
                 { word: "should", meaning: "〜すべきだ" }
             ],
-            // Stage 5 (30語)
+            // Stage 5
             [
                 { word: "nurse", meaning: "看護師" },
                 { word: "true", meaning: "真実、本当" },
@@ -467,7 +439,7 @@
                 { word: "danger", meaning: "危険" },
                 { word: "movie", meaning: "映画" }
             ],
-            // Stage 6 (30語)
+            // Stage 6
             [
                 { word: "tired", meaning: "疲れている" },
                 { word: "decide", meaning: "決める、決定する" },
@@ -499,6 +471,36 @@
                 { word: "cheap", meaning: "安い" },
                 { word: "price", meaning: "価格" },
                 { word: "steal(stole)", meaning: "盗む" }
+            ],
+            // Stage 7
+            [
+                { word: "special", meaning: "特別な" },
+                { word: "everywhere", meaning: "どこにでも" },
+                { word: "anytime", meaning: "いつでも" },
+                { word: "anything", meaning: "何か" },
+                { word: "everything", meaning: "あらゆるもの" },
+                { word: "What's wrong?", meaning: "どうしたの？" },
+                { word: "leave(left)", meaning: "置いていく、離れる" },
+                { word: "buy(bought)", meaning: "買う" },
+                { word: "teach(taught)", meaning: "教える" },
+                { word: "begin(began)", meaning: "始める" },
+                { word: "need to", meaning: "〜する必要がある" },
+                { word: "sound", meaning: "音がする" },
+                { word: "spend", meaning: "過ごす、費やす" },
+                { word: "wrap", meaning: "包む" },
+                { word: "reach", meaning: "届く、到着する" },
+                { word: "most of", meaning: "〜の大半が" },
+                { word: "be able to", meaning: "〜できる" },
+                { word: "pass", meaning: "合格する" },
+                { word: "grow", meaning: "育てる" },
+                { word: "hold", meaning: "つかむ、かかえる" },
+                { word: "introduce", meaning: "紹介する" },
+                { word: "believe", meaning: "信じる" },
+                { word: "bake", meaning: "焼く" },
+                { word: "relax", meaning: "リラックスする" },
+                { word: "castle", meaning: "城" },
+                { word: "build(built)", meaning: "建てる" },
+                { word: "date", meaning: "日付" }
             ]
         ];
 
@@ -516,10 +518,12 @@
         }
         initializeWordLists();
 
-        // ==========================================
-        // 2. STATE & GLOBAL CONFIGURATION
-        // ==========================================
-        const TOTAL_STAGES = STAGE_LISTS.length; // 6ステージ
+        // Helper filter check for input mode
+        function isInputEligibleWord(word) {
+            return !word.includes('〜') && !word.includes('...');
+        }
+
+        const TOTAL_STAGES = STAGE_LISTS.length;
         const STORAGE_KEY = 'EIKEN3_LEAP13_CLEARED_STAGES_V1';
         const CUSTOM_DATA_KEY = 'EIKEN3_LEAP13_CUSTOM_WORDS_V1';
 
@@ -530,7 +534,6 @@
         let score = 0;
         let isAnswering = false;
         let audioEnabled = true;
-
         let speechEnabled = true;
 
         let timerId = null;
@@ -549,7 +552,6 @@
                 const now = audioCtx.currentTime;
 
                 if (type === 'correct') {
-                    // 【正解音】ピンポン
                     const osc1 = audioCtx.createOscillator();
                     const osc2 = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
@@ -572,7 +574,6 @@
                     osc2.start(now + 0.12);
                     osc2.stop(now + 0.5);
                 } else if (type === 'wrong') {
-                    // 【不正解音】ブー
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
 
@@ -610,22 +611,9 @@
                         osc.start(now + note.t);
                         osc.stop(now + note.t + duration);
                     });
-
-                    [523.25, 783.99].forEach(freq => {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(freq, now + 0.24);
-                        gain.gain.setValueAtTime(0.1, now + 0.24);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
-                        osc.start(now + 0.24);
-                        osc.stop(1.0);
-                    });
                 }
             } catch (e) {
-                console.warn("Audio playback not supported or blocked");
+                console.warn("Audio not supported");
             }
         }
 
@@ -665,9 +653,6 @@
             window.speechSynthesis.speak(uttr);
         }
 
-        // ==========================================
-        // 3. STORAGE & PROGRESS TRACKING
-        // ==========================================
         function getClearedStages() {
             try {
                 const saved = localStorage.getItem(STORAGE_KEY);
@@ -726,11 +711,18 @@
 
             document.getElementById('overall-progress-percentage').textContent = `${overallPercent}% (${currentModePerfectCount} / ${TOTAL_STAGES}ステージ)`;
             document.getElementById('overall-progress-bar').style.width = `${overallPercent}%`;
+
+            let displayWordTotal = 0;
+            STAGE_LISTS.forEach(st => {
+                if (currentMode === 'input') {
+                    displayWordTotal += st.filter(w => isInputEligibleWord(w.word)).length;
+                } else {
+                    displayWordTotal += st.length;
+                }
+            });
+            document.getElementById('total-words-display').textContent = displayWordTotal;
         }
 
-        // ==========================================
-        // 4. UI SCREEN MANAGEMENT & STAGE SELECTION
-        // ==========================================
         function selectMode(mode) {
             currentMode = mode;
             const choiceBtn = document.getElementById('mode-choice-btn');
@@ -778,7 +770,11 @@
 
             for (let i = 0; i < TOTAL_STAGES; i++) {
                 const stageNumber = i + 1;
-                const wordCount = STAGE_LISTS[i].length;
+                let rawList = STAGE_LISTS[i];
+                if (currentMode === 'input') {
+                    rawList = rawList.filter(w => isInputEligibleWord(w.word));
+                }
+                const wordCount = rawList.length;
 
                 const stageData = cleared[i] || {};
                 const currentModeData = stageData[currentMode] || { accuracy: 0, cleared: false };
@@ -824,9 +820,6 @@
             }
         }
 
-        // ==========================================
-        // 5. QUIZ LOGIC & INTERACTION
-        // ==========================================
         function shuffleArray(array) {
             const arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -842,7 +835,17 @@
             }
 
             currentStageIndex = stageIdx;
-            const sliceWords = STAGE_LISTS[stageIdx];
+            let sliceWords = STAGE_LISTS[stageIdx];
+
+            if (currentMode === 'input') {
+                sliceWords = sliceWords.filter(w => isInputEligibleWord(w.word));
+            }
+
+            if (sliceWords.length === 0) {
+                alert("このステージにはスペル入力モードの出題対象単語がありません。");
+                return;
+            }
+
             currentStageWords = shuffleArray(sliceWords);
 
             currentQuestionIndex = 0;
@@ -885,12 +888,10 @@
             const total = currentStageWords.length;
             const currentObj = currentStageWords[currentQuestionIndex];
 
-            // プログレスバー更新
             document.getElementById('quiz-progress-text').textContent = `${currentQuestionIndex + 1} / ${total}`;
             const progressPercent = (currentQuestionIndex / total) * 100;
             document.getElementById('quiz-progress-bar').style.width = `${progressPercent}%`;
 
-            // 出題情報更新
             document.getElementById('word-id-tag').textContent = `No. ${currentQuestionIndex + 1}`;
 
             if (currentMode === 'choice' || currentMode === 'jp_choice') {
@@ -902,7 +903,6 @@
                     speakWord(currentObj.word);
                 }
 
-                // 全単語リストからダミー選択肢を抽出
                 const otherWords = allWordsList.filter(w => w.word !== currentObj.word && w.meaning !== currentObj.meaning);
                 
                 let shuffledOthers = [];
@@ -959,9 +959,6 @@
             startTimer(durationMs);
         }
 
-        // ==========================================
-        // TIMER & PAUSE LOGIC
-        // ==========================================
         function startTimer(durationMs) {
             stopTimer();
             timerTotalMs = durationMs;
@@ -1086,20 +1083,52 @@
             setTimeout(nextQuestion, 1400);
         }
 
+        function checkInputSpellingMatch(userInput, targetWord) {
+            const rawUser = userInput.trim().toLowerCase();
+            const rawTarget = targetWord.trim().toLowerCase();
+
+            // 1. 完全一致（大文字小文字無視、"there is(are)" そのもの）
+            if (rawUser === rawTarget) {
+                return true;
+            }
+
+            const cleanStr = (s) => s.replace(/[^a-z0-9]/g, '');
+
+            // カッコがない単語の場合、全記号・余白除去比較
+            if (!targetWord.includes('(')) {
+                return cleanStr(rawUser) === cleanStr(rawTarget);
+            }
+
+            // カッコを含む単語の判定バリエーション
+            // ① カッコとその中身を丸ごと削除（例: "there is(are)" -> "there is"）
+            const targetWithoutParenContent = rawTarget.replace(/\([^)]*\)/g, '').trim();
+            if (rawUser === targetWithoutParenContent) return true;
+            if (cleanStr(rawUser) === cleanStr(targetWithoutParenContent)) return true;
+
+            // ② カッコ記号のみを削除し、中身の文字を残す（例: "there is(are)" -> "there isare" または "there is are"）
+            const targetWithoutParenSymbols = rawTarget.replace(/[()]/g, ' ').replace(/\s+/g, ' ').trim();
+            if (rawUser === targetWithoutParenSymbols) return true;
+            if (cleanStr(rawUser) === cleanStr(targetWithoutParenSymbols)) return true;
+
+            return false;
+        }
+
         function handleInputSubmit(e) {
             e.preventDefault();
             if (!isAnswering || isPaused) return;
 
             const inputEl = document.getElementById('word-input');
-            const userVal = inputEl.value.trim().toLowerCase();
-            const correctVal = currentStageWords[currentQuestionIndex].word.toLowerCase();
+            const userVal = inputEl.value;
+            const targetWord = currentStageWords[currentQuestionIndex].word;
 
-            if (!userVal) return;
+            if (!userVal.trim()) return;
             isAnswering = false;
             stopTimer();
             inputEl.disabled = true;
 
-            if (userVal === correctVal) {
+            const isCorrect = checkInputSpellingMatch(userVal, targetWord);
+
+            if (isCorrect) {
                 score++;
                 playSound('correct');
                 inputEl.className = "w-full text-center text-lg font-bold py-2.5 px-3 border-2 border-emerald-500 bg-emerald-50 text-emerald-800 rounded-xl focus:outline-none shadow-sm transition";
@@ -1107,7 +1136,7 @@
             } else {
                 playSound('wrong');
                 inputEl.className = "w-full text-center text-lg font-bold py-2.5 px-3 border-2 border-rose-500 bg-rose-50 text-rose-800 rounded-xl focus:outline-none shadow-sm transition shake";
-                showFeedback(false, `不正解... 正解: ${currentStageWords[currentQuestionIndex].word}`);
+                showFeedback(false, `不正解... 正解: ${targetWord}`);
             }
 
             setTimeout(nextQuestion, 1500);
@@ -1140,9 +1169,6 @@
             }
         }
 
-        // ==========================================
-        // 6. RESULT & DATA IMPORT / EXPORT
-        // ==========================================
         function showResultScreen() {
             stopTimer();
             document.getElementById('main-header').classList.remove('hidden');
